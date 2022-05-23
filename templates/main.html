@@ -1,0 +1,31 @@
+<html>
+    <head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+   <link rel='stylesheet'
+          href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'
+          integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh'
+          crossorigin='anonymous'>
+        <title>{{ title }}</title>
+    </head>
+
+  <center><h2>About |tems</h2></center>
+
+ <center>
+<form name='form' action='' method='post' >
+{{ form.hidden_tag() }}
+        <p>
+            {{ form.load_inventory }}<br>
+            {% if form.load_inventory.errors %}
+                <ul class="errors">
+                {% for error in form.load_inventory.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </p>
+            <p>{{ form.submit(type='submit', class='btn btn-primary') }}</p>
+            <p>{{ form.logout(type='submit', class='btn btn-primary') }}</p>
+        <div>{{ message }}</div>
+
+</form>
+ </center>
