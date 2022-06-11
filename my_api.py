@@ -1,5 +1,4 @@
 import datetime
-
 import requests
 from bs4 import BeautifulSoup
 from flask import Blueprint, jsonify, make_response, request
@@ -29,21 +28,24 @@ def get_user_history(id):
     history = session.query(UserHistory).get(id)
     if not history:
         return make_response(jsonify({'error': 'Not found'}), 404)
+    print(history.tasks)
     history_dict = {}
     dates = history.tasks.split('#')[1:][::2]
     tasks = history.tasks.split('#')[1:]
     for i in range(len(dates)):
         date_list = []
-        task = tasks[i * 2 + 1]
-        items = task.split(';;')
-        for item in items:
-            item_info = {}
-            keys = item.split('>')[1::2]
-            vals = item.split('>')[2::2]
-            for s in range(len(keys)):
-                item_info[keys[s]] = vals[s]
-            date_list.append(item_info)
-        history_dict[dates[i]] = date_list
+        task = tasks[i * 2 + 1][:-2]
+        item_info = {}
+        keys = task.split('>')[1::2]
+        vals = task.split('>')[2::2]
+        for s in range(len(keys)):
+            item_info[keys[s]] = vals[s]
+        date_list.append(item_info)
+
+        if dates[i] in history_dict:
+            history_dict[dates[i]] += date_list
+        else:
+            history_dict[dates[i]] = date_list
 
     return jsonify(history_dict)
 
@@ -253,7 +255,6 @@ def find_on_steam_bp(name, id):
             history += 'Found;;'
             backpack_costs = backpack_costs['backpack_costs']
 
-        print(history)
         add_user_history(history, id)
         return jsonify({'name': name, 'steam_costs': costs, 'backpack_costs': backpack_costs, 'image': image})
 
