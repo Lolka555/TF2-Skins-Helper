@@ -77,12 +77,15 @@ def main():
     if form.validate_on_submit():
         if form.submit.data:
             filename = os.path.abspath(form.load_inventory.data)
+            if not filename or filename.split('.')[-1] not in ['txt', 'pdf', 'doc']:
+                return render_template('main.html', title='About |tems', form=form)
             with open(filename, 'r') as f:
                 inventory_items = list(map(str.strip, f.readlines()))
             info = {'path': filename, 'items': ';'.join(inventory_items)}
             requests.request('POST', f'{API_ADDRESS}users/inventory/{current_user.get_id()}', json=info)
             for i in inventory_items:
-                requests.request(f'{API_ADDRESS}find_on_steam/{i}/{current_user.get_id()}')
+                result = requests.get(f'{API_ADDRESS}find_on_steam_bp/{i}/{current_user.get_id()}').json()
+                form.items.append(result)
         if form.logout.data:
             return redirect('/logout')
     return render_template('main.html', title='About |tems', form=form)
@@ -91,4 +94,5 @@ def main():
 if __name__ == '__main__':
     db_session.global_init(os.path.join(os.getcwd(), DB_NAME))
     app.register_blueprint(my_blueprint)
-    app.run(port=8080, host='127.0.0.1')
+    '''запускайте на вашем серваке'''
+    app.run(port=8080, host='127.0.0.1') # локалка
